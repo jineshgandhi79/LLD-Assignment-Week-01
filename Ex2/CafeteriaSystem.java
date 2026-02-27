@@ -1,28 +1,25 @@
 import java.util.*;
 
 public class CafeteriaSystem {
-    private final Map<String, MenuItem> menu = new LinkedHashMap<>();
-    private final IInvoiceStore store;
-    private final PricingCalculator calculator;
-    private final InvoiceFormatter formatter;
-    private int invoiceSeq = 1000;
+    private final Map<String, MenuItem> menu;
+    private final FileStore store;
 
-    public CafeteriaSystem(IInvoiceStore store) {
-        this.store = store;
-        this.calculator = new PricingCalculator();
-        this.formatter = new InvoiceFormatter();
+    CafeteriaSystem() {
+        this.menu = new LinkedHashMap<>();
+        this.store = new FileStore();
     }
 
     public void addToMenu(MenuItem i) { menu.put(i.id, i); }
-
+    
     public void checkout(String customerType, List<OrderLine> lines) {
-        String invId = "INV-" + (++invoiceSeq);
-        
-        BillContext context = calculator.calculate(invId, customerType, lines, menu);
-        String printable = formatter.format(context);
-        
+
+        BillContext bill = new BillContext(lines,menu,customerType);
+        InvoiceFormatter invoiceFormatter = new InvoiceFormatter(bill, menu);
+
+        String printable = invoiceFormatter.generateFormat();
         System.out.print(printable);
-        store.save(invId, printable);
-        System.out.println("Saved invoice: " + invId + " (lines=" + store.countLines(invId) + ")");
+
+        store.save(bill.getInvId(), printable);
+        System.out.println("Saved invoice: " + bill.getInvId() + " (lines=" + store.countLines(bill.getInvId()) + ")");
     }
 }
