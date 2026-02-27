@@ -1,41 +1,35 @@
 import java.util.*;
 
 public class OnboardingService {
-    private final IStudentRepository repository;
-    private final StudentParser parser;
-    private final StudentValidator validator;
-    private final IdGenerator idGenerator;
-    private final ViewRenderer renderer;
+    private final FakeDb db;
+    private final ParseStudent ps;
+    private final ValidateStudent vs;
 
-    public OnboardingService(IStudentRepository repository) {
-        this.repository = repository;
-        this.parser = new StudentParser();
-        this.validator = new StudentValidator();
-        this.idGenerator = new IdGenerator();
-        this.renderer = new ViewRenderer();
+    public OnboardingService(FakeDb db) { 
+        this.db = db;
+        this.vs = new ValidateStudent();
+        this.ps = new ParseStudent();
     }
 
     public void registerFromRawInput(String raw) {
-        renderer.printInput(raw);
-
-        Map<String, String> data = parser.parseRawInput(raw);
-        List<String> errors = validator.validate(data);
-
+        
+        StudentDTO dto = ps.parseStudent(raw);
+        List<String> errors = vs.validate(dto);
+        
         if (!errors.isEmpty()) {
-            renderer.printErrors(errors);
+            System.out.println("ERROR: cannot register");
+            for (String e : errors) System.out.println("- " + e);
             return;
         }
 
-        String id = idGenerator.generateNextId(repository.count());
-        StudentRecord record = new StudentRecord(
-            id,
-            data.get("name"),
-            data.get("email"),
-            data.get("phone"),
-            data.get("program")
-        );
+        String id = IdUtil.nextStudentId(db.count());
+        StudentRecord rec = new StudentRecord(id, dto.name, dto.email, dto.phone, dto.program);
 
-        repository.save(record);
-        renderer.printSuccess(record, repository.count());
+        db.save(rec);
+
+        System.out.println("OK: created student " + id);
+        System.out.println("Saved. Total students: " + db.count());
+        System.out.println("CONFIRMATION:");
+        System.out.println(rec);
     }
 }
