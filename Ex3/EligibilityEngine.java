@@ -2,11 +2,15 @@ import java.util.*;
 
 public class EligibilityEngine {
     private final FakeEligibilityStore store;
-    private final List<IEligibilityRule> rules;
+    private final ArrayList<IEligibilityRule> eligibilityRules;
 
-    public EligibilityEngine(FakeEligibilityStore store, List<IEligibilityRule> rules) {
+    public EligibilityEngine(FakeEligibilityStore store) { 
         this.store = store;
-        this.rules = rules;
+        this.eligibilityRules = new ArrayList<>();
+        eligibilityRules.add(new AttendanceRule());
+        eligibilityRules.add(new CgrRule());
+        eligibilityRules.add(new DisciplineRule());
+        eligibilityRules.add(new CreditsRule());;
     }
 
     public void runAndPrint(StudentProfile s) {
@@ -18,17 +22,16 @@ public class EligibilityEngine {
 
     public EligibilityEngineResult evaluate(StudentProfile s) {
         List<String> reasons = new ArrayList<>();
-        
-        for (IEligibilityRule rule : rules) {
-            ValidationResult res = rule.validate(s);
-            if (!res.isEligible) {
-                reasons.add(res.reason);
-                // Break after first failure to match legacy short-circuit behavior
-                break; 
+
+        for(IEligibilityRule eligibilityRule : eligibilityRules) {
+            Eligible eligible = eligibilityRule.eval(s);
+            if(!eligible.isEligible()) {
+                reasons.add(eligible.getReason());
             }
         }
 
         String status = reasons.isEmpty() ? "ELIGIBLE" : "NOT_ELIGIBLE";
+
         return new EligibilityEngineResult(status, reasons);
     }
 }

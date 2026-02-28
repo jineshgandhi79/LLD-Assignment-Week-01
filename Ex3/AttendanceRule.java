@@ -1,9 +1,8 @@
 public class AttendanceRule implements IEligibilityRule {
-    @Override
-    public ValidationResult validate(StudentProfile s) {
+    public Eligible eval(StudentProfile s) {
         if (s.attendancePct < 75) {
-            return ValidationResult.invalid("attendance below 75");
+            return new Eligible(false, "attendance below 75");
         }
-        return ValidationResult.valid();
+        return new Eligible(true, null);
     }
 }

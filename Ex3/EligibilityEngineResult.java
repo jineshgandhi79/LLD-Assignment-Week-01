@@ -1,6 +1,6 @@
-import java.util.List;
+import java.util.*;
 
-public class EligibilityEngineResult {
+class EligibilityEngineResult {
     public final String status;
     public final List<String> reasons;
     public EligibilityEngineResult(String status, List<String> reasons) {

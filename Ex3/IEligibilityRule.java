@@ -1,3 +1,3 @@
 public interface IEligibilityRule {
-    ValidationResult validate(StudentProfile student);
+    Eligible eval(StudentProfile s);
 }

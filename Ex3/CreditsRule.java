@@ -1,9 +1,8 @@
 public class CreditsRule implements IEligibilityRule {
-    @Override
-    public ValidationResult validate(StudentProfile s) {
+    public Eligible eval(StudentProfile s) {
         if (s.earnedCredits < 20) {
-            return ValidationResult.invalid("credits below 20");
+            return new Eligible(false, "credits below 20");
         }
-        return ValidationResult.valid();
+        return new Eligible(true, null);
     }
 }
