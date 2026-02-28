@@ -1,13 +1,14 @@
 import java.util.*;
+
 public class PricingRegistry {
-    private static final Map<Integer, IRoomPricing> roomRules = new HashMap<>();
+    private static final Map<Integer,IRoomType> roomPrices = new HashMap<>();
     static {
-        roomRules.put(LegacyRoomTypes.SINGLE, new SingleRoomPricing());
-        roomRules.put(LegacyRoomTypes.DOUBLE, new DoubleRoomPricing());
-        roomRules.put(LegacyRoomTypes.TRIPLE, new TripleRoomPricing());
-        roomRules.put(LegacyRoomTypes.DELUXE, new DeluxeRoomPricing());
+        roomPrices.put(LegacyRoomTypes.SINGLE, new SingleRoom());
+        roomPrices.put(LegacyRoomTypes.DOUBLE, new DoubleRoom());
+        roomPrices.put(LegacyRoomTypes.TRIPLE, new TripleRoom());
+        roomPrices.put(LegacyRoomTypes.DELUXE, new DeluxeRoom());
     }
-    public static IRoomPricing getRoomRule(int type) {
-        return roomRules.getOrDefault(type, new DeluxeRoomPricing());
+    public static IRoomType getRoom(int type) {
+        return roomPrices.getOrDefault(type,new DeluxeRoom());
     }
 }
